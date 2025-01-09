@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "tic-tac-toe"
 include(":app")
+include(":presentation")
