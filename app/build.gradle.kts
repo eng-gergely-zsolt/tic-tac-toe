@@ -43,6 +43,7 @@ android {
 dependencies {
     // Module
     implementation(project(":presentation"))
+    implementation(project(":common:design-kit"))
 
     // Core
     implementation(libs.kotlinx.serialization.json)
