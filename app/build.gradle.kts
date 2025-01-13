@@ -42,6 +42,7 @@ android {
 
 dependencies {
     // Module
+    implementation(project(":core"))
     implementation(project(":presentation"))
     implementation(project(":common:design-kit"))
 
@@ -50,12 +51,16 @@ dependencies {
 
     // Jetpack Compose
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.runtime.livedata)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(platform(libs.androidx.compose.bom))
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
+
+    // Koin
+    implementation(libs.koin.androidx.compose)
     
     // Testing
     testImplementation(libs.junit)

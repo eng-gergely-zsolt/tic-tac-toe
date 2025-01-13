@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base strings -->
+    <string name="home">Home</string>
+    <string name="draw">Draw</string>
+    <string name="replay">Replay</string>
+
+    <!-- Content description -->
+    <string name="home_icon_description">Home icon</string>
+    <string name="back_icon_description">Back icon</string>
+    <string name="replay_icon_description">Replay icon</string>
+    <string name="host_icon_description">Host\'s symbol</string>
+    <string name="guest_icon_description">Guest\'s symbol</string>
+    <string name="draw_icon_description">Draw counter symbol</string>
+    <string name="reset_game_icon_description">Reset game icon</string>
+
+    <!-- Parameterized -->
+    <string name="win_counter">%1$s wins</string>
+    <string name="draw_counter">%1$s draws</string>
+    <string name="end_game_title">%1$s wins</string>
+</resources>

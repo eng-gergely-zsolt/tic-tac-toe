@@ -12,7 +12,11 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
+    primary = TumbleWeed,
+    secondary = TuftsBlue,
+    tertiary = SeaSerpent,
     background = Color.White,
+
 )
 
 /**
