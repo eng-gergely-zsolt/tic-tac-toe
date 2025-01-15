@@ -4,5 +4,11 @@ import kotlinx.serialization.Serializable
 
 sealed class NavigationRoute {
     @Serializable
-    data object TicTacToeNavigationRoute : NavigationRoute()
+    data object LandingNavigationRoute : NavigationRoute()
+
+    @Serializable
+    data object HistoryNavigationRoute : NavigationRoute()
+
+    @Serializable
+    data class TicTacToeNavigationRoute(val boardSize: Int) : NavigationRoute()
 }

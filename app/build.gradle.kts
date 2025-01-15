@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -28,13 +29,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
     kotlinOptions {
         jvmTarget = ProjectConfiguration.JVM_TARGET
     }
+
     buildFeatures {
         compose = true
     }
@@ -43,6 +47,7 @@ android {
 dependencies {
     // Module
     implementation(project(":core"))
+    implementation(project(":common:room"))
     implementation(project(":presentation"))
     implementation(project(":common:design-kit"))
 
@@ -51,8 +56,8 @@ dependencies {
 
     // Jetpack Compose
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.runtime.livedata)
     debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(platform(libs.androidx.compose.bom))
 
@@ -60,8 +65,14 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // Koin
-    implementation(libs.koin.androidx.compose)
-    
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.androidx.koin.compose)
+    implementation(libs.androidx.koin.compose.navigation)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

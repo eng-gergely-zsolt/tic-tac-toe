@@ -1,4 +1,4 @@
-package com.example.presentation
+package com.example.presentation.game
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,11 +7,20 @@ import androidx.lifecycle.ViewModel
 import com.example.core.domain.model.Field
 import com.example.core.domain.model.Player
 import com.example.core.domain.model.TakenField
+import com.example.core.domain.model.TicTacToe
+import com.example.core.domain.repository.TicTacToeDbRepository
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import java.time.LocalDateTime
 
-class TicTacToeViewModel : ViewModel() {
+class TicTacToeViewModel(
+    private val ticTacToeDbRepository: TicTacToeDbRepository
+) : ViewModel() {
     var boardSize = 3
 
     private var takenMoves: Int = 0
+
+    private val disposables = CompositeDisposable()
 
     private lateinit var magicSquare: Array<IntArray>
 
@@ -31,6 +40,22 @@ class TicTacToeViewModel : ViewModel() {
     )
 
     val state: TicTacToeContract.TicTacToeState get() = _state
+
+    private var startDateTime: LocalDateTime = LocalDateTime.now().withSecond(0).withNano(0)
+
+    override fun onCleared() {
+        super.onCleared()
+
+        disposables.clear()
+    }
+
+    fun dismissDialog() {
+        _state = _state.copy(
+            winner = null,
+            isDraw = false,
+            showEndGameDialog = false
+        )
+    }
 
     fun replay() {
         takenMoves = 0
@@ -121,18 +146,22 @@ class TicTacToeViewModel : ViewModel() {
     }
 
     private fun checkEndGame(currentPlayer: Player) {
-        if (hasPlayerWon(currentPlayer)) {
-            _state = _state.copy(
+        _state = if (hasPlayerWon(currentPlayer)) {
+            _state.copy(
                 winner = currentPlayer,
                 hostWins = if (currentPlayer == Player.Host) _state.hostWins + 1 else _state.hostWins,
                 guestWins = if (currentPlayer == Player.Guest) _state.guestWins + 1 else _state.guestWins,
             )
         } else if (takenMoves == boardSize * boardSize) {
-            _state = _state.copy(
+            _state.copy(
                 isDraw = true,
                 draws = _state.draws + 1
             )
+        } else {
+            return
         }
+
+        saveTicTacToeMatch()
     }
 
     private fun hasPlayerWon(currentPlayer: Player): Boolean {
@@ -158,6 +187,28 @@ class TicTacToeViewModel : ViewModel() {
 
         // If no winning condition met, return false
         return false
+    }
+
+    private fun saveTicTacToeMatch() {
+        val disposable = ticTacToeDbRepository.saveTicTacToeMatch(
+            TicTacToe(
+                draws = _state.draws,
+                hostWins = _state.hostWins,
+                guestWins = _state.guestWins,
+                startDateTime = startDateTime
+            )
+        )
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                {
+
+                },
+                { error ->
+
+                }
+            )
+
+        disposables.add(disposable)
     }
 
     /**

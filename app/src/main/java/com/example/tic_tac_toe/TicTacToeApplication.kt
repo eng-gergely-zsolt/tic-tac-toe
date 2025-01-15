@@ -1,6 +1,8 @@
 package com.example.tic_tac_toe
 
 import android.app.Application
+import com.example.tic_tac_toe.di.DataModule
+import com.example.tic_tac_toe.di.DatabaseModule
 import com.example.tic_tac_toe.di.ViewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -19,7 +21,7 @@ class TicTacToeApplication : Application() {
             androidContext(this@TicTacToeApplication)
 
             // Load and register the dependency modules with Koin.
-            modules(ViewModelModule)
+            modules(DatabaseModule, DataModule, ViewModelModule)
         }
     }
 }

@@ -52,8 +52,8 @@ dependencies {
     // Compose viewmodel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // Koin
-    implementation(libs.koin.androidx.compose)
+    // Room
+    implementation(libs.androidx.room.rxjava3)
 
     // Test
     testImplementation(libs.junit)

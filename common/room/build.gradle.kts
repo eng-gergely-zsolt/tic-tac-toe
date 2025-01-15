@@ -1,10 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.example.core"
+    namespace = "com.example.room"
     compileSdk = ProjectConfiguration.COMPILE_SDK
 
     defaultConfig {
@@ -35,9 +37,9 @@ android {
 }
 
 dependencies {
-    // Module
-    implementation(project(":common:room"))
-
     // Room
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.rxjava3)
 }

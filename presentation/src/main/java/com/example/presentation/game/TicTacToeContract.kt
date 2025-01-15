@@ -1,4 +1,4 @@
-package com.example.presentation
+package com.example.presentation.game
 
 import com.example.core.domain.model.Field
 import com.example.core.domain.model.Player
@@ -14,4 +14,10 @@ class TicTacToeContract {
         val board: MutableSet<Field>,
         val showEndGameDialog: Boolean
     )
+}
+
+sealed interface TicTacToeSideEffect {
+    sealed interface Navigation : TicTacToeSideEffect {
+        data object NavigateBack : Navigation
+    }
 }

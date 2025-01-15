@@ -11,6 +11,7 @@
     <string name="replay_icon_description">Replay icon</string>
     <string name="host_icon_description">Host\'s symbol</string>
     <string name="guest_icon_description">Guest\'s symbol</string>
+    <string name="forward_arrow_description">Forward arrow</string>
     <string name="draw_icon_description">Draw counter symbol</string>
     <string name="reset_game_icon_description">Reset game icon</string>
 
@@ -18,4 +19,10 @@
     <string name="win_counter">%1$s wins</string>
     <string name="draw_counter">%1$s draws</string>
     <string name="end_game_title">%1$s wins</string>
+
+    <string name="board_size_3">3 x 3 tiles</string>
+    <string name="board_size_4">4 x 4 tiles</string>
+    <string name="board_size_5">5 x 5 tiles</string>
+    <string name="landing_see_history">See game history here</string>
+    <string name="landing_choose_board_size">Choose the size of the board you want to play on.</string>
 </resources>

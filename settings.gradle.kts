@@ -22,7 +22,8 @@ dependencyResolutionManagement {
 rootProject.name = "tic-tac-toe"
 
 include(":app")
-include(":presentation")
-include(":common:theme")
-include(":common:design-kit")
 include(":core")
+include(":presentation")
+
+include(":common:room")
+include(":common:design-kit")

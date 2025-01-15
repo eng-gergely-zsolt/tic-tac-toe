@@ -1,4 +1,4 @@
-package com.example.presentation
+package com.example.presentation.game
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -48,12 +48,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.core.domain.model.Player
+import com.example.presentation.R
 import kotlin.math.pow
+import com.example.presentation.game.TicTacToeSideEffect.Navigation.NavigateBack
 
 @Composable
 fun TicTacToeScreen(
     boardSize: Int = 3,
-    viewModel: TicTacToeViewModel
+    viewModel: TicTacToeViewModel,
+    onNavigation: ((TicTacToeSideEffect.Navigation) -> Unit)
 ) {
 
     var rowMultiplier = 1
@@ -71,13 +74,17 @@ fun TicTacToeScreen(
     viewModel.state.winner?.let { winner ->
         EndGameDialog(
             winner = winner,
-            onDismissRequest = { viewModel.replay() }
+            onNavigation = onNavigation,
+            onReplay = { viewModel.replay() },
+            onDismiss = { viewModel.dismissDialog() }
         )
     }
 
     if (viewModel.state.isDraw) {
         EndGameDialog(
-            onDismissRequest = { viewModel.replay() }
+            onNavigation = onNavigation,
+            onReplay = { viewModel.replay() },
+            onDismiss = { viewModel.dismissDialog() }
         )
     }
 
@@ -222,7 +229,9 @@ fun TicTacToeScreen(
                     FilledIconButton(
                         modifier = Modifier
                             .size(55.dp),
-                        onClick = {},
+                        onClick = {
+                            onNavigation.invoke(NavigateBack)
+                        },
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         ),
@@ -276,8 +285,10 @@ fun TicTacToeScreen(
 
 @Composable
 fun EndGameDialog(
+    onReplay: () -> Unit,
+    onDismiss: () -> Unit,
     winner: Player? = null,
-    onDismissRequest: () -> Unit
+    onNavigation: (TicTacToeSideEffect.Navigation) -> Unit
 ) {
     Dialog(
         onDismissRequest = {}
@@ -308,7 +319,7 @@ fun EndGameDialog(
                     modifier = Modifier
                         .padding(bottom = 20.dp),
                     onClick = {
-                        onDismissRequest()
+                        onReplay()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
@@ -336,7 +347,10 @@ fun EndGameDialog(
                 OutlinedButton(
                     modifier = Modifier
                         .padding(bottom = 20.dp),
-                    onClick = {},
+                    onClick = {
+                        onDismiss()
+                        onNavigation.invoke(NavigateBack)
+                    },
                     border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
                 ) {
                     Row(

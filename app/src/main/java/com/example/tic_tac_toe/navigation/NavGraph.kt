@@ -10,8 +10,12 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = NavigationRoute.TicTacToeNavigationRoute
+        startDestination = NavigationRoute.LandingNavigationRoute
     ) {
+        historyNavigation()
+
+        landingNavigation(navController = navController)
+
         ticTacToeNavigation(navController = navController)
     }
 }
