@@ -29,6 +29,8 @@ class TicTacToeViewModel(
 
     private lateinit var resultSquare: Array<Array<TakenField>>
 
+    private val animationMap: MutableMap<Int, Boolean> = mutableMapOf()
+
     private var _state by mutableStateOf(
         TicTacToeState(
             draws = 0,
@@ -38,7 +40,8 @@ class TicTacToeViewModel(
             isDraw = false,
             board = mutableSetOf(),
             showEndGameDialog = false,
-            currentPlayer = Player.Host,
+            borderMap = mutableMapOf(),
+            currentPlayer = Player.Host
         )
     )
 
@@ -69,6 +72,8 @@ class TicTacToeViewModel(
     fun replay() {
         takenMoves = 0
 
+        animationMap.clear()
+
         resultSquare = Array(boardSize) { Array(boardSize) { TakenField() } }
 
         _state = _state.copy(
@@ -85,6 +90,8 @@ class TicTacToeViewModel(
     fun resetBoard() {
         takenMoves = 0
 
+        animationMap.clear()
+
         resultSquare = Array(boardSize) { Array(boardSize) { TakenField() } }
 
         _state = _state.copy(
@@ -96,6 +103,8 @@ class TicTacToeViewModel(
      * Initialize the board fo the game to start.
      */
     fun initializeBoard(boardSize: Int) {
+        val borderMap: MutableMap<Int, Pair<Boolean, Boolean>> = mutableMapOf()
+
         this.boardSize = boardSize
 
         magicSquare = Array(boardSize) { IntArray(boardSize) }
@@ -108,6 +117,31 @@ class TicTacToeViewModel(
         } else {
             generateDoublyEvenMagicSquare()
         }
+
+        for (i in 0 until boardSize * boardSize) {
+            val leftBorder = i % boardSize != 0
+
+            val bottomBorder = i + 1 <= boardSize * (boardSize - 1)
+
+            borderMap[i] = Pair(leftBorder, bottomBorder)
+        }
+
+        _state = _state.copy(
+            borderMap = borderMap
+        )
+    }
+
+    /**
+     * Checks whether it's necessary to animate the icon or not. We animate them only once when it's first placed.
+     */
+    fun shouldAnimate(indexOfField: Int): Boolean {
+        val result = animationMap[indexOfField] == false
+
+        if (!result) {
+            animationMap[indexOfField] = true
+        }
+
+        return result
     }
 
     /**
@@ -126,17 +160,25 @@ class TicTacToeViewModel(
 
             ++takenMoves
 
-            updatedBoard.add(lastTakenField)
-
-            _state = _state.copy(
-                board = updatedBoard
-            )
-
             updateResulSquare(indexOfField)
 
-            updateCurrentPlayer()
+            updatedBoard.add(lastTakenField)
 
-            checkEndGame(currentPlayer)
+            animationMap[indexOfField] = false
+
+            val updatedPlayer = updateCurrentPlayer()
+
+            val updatedEndGame = checkEndGame(currentPlayer)
+
+            _state = _state.copy(
+                board = updatedBoard,
+                draws = updatedEndGame.draws,
+                isDraw = updatedEndGame.isDraw,
+                winner = updatedEndGame.winner,
+                hostWins = updatedEndGame.hostWins,
+                guestWins = updatedEndGame.guestWins,
+                currentPlayer = updatedPlayer.currentPlayer,
+            )
         }
     }
 
@@ -157,8 +199,8 @@ class TicTacToeViewModel(
     /**
      * Update the current play after every turn.
      */
-    private fun updateCurrentPlayer() {
-        _state = if (_state.currentPlayer == Player.Host) {
+    private fun updateCurrentPlayer(): TicTacToeState {
+        return if (_state.currentPlayer == Player.Host) {
             _state.copy(
                 currentPlayer = Player.Guest
             )
@@ -172,8 +214,8 @@ class TicTacToeViewModel(
     /**
      * Check whether a game is over or not. (Has been won or is a draw.)
      */
-    private fun checkEndGame(currentPlayer: Player) {
-        _state = if (hasPlayerWon(currentPlayer)) {
+    private fun checkEndGame(currentPlayer: Player): TicTacToeState {
+        val updatedEndGame = if (hasPlayerWon(currentPlayer)) {
             _state.copy(
                 winner = currentPlayer,
                 hostWins = if (currentPlayer == Player.Host) _state.hostWins + 1 else _state.hostWins,
@@ -185,10 +227,12 @@ class TicTacToeViewModel(
                 draws = _state.draws + 1
             )
         } else {
-            return
+            return _state
         }
 
         saveTicTacToeMatch()
+
+        return updatedEndGame
     }
 
     /**

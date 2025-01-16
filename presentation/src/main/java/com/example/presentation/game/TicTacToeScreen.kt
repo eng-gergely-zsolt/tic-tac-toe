@@ -1,5 +1,7 @@
 package com.example.presentation.game
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.keyframes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,9 +34,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -183,7 +187,7 @@ fun SetGameBoard(
     boardSize: Int,
     viewModel: TicTacToeViewModel
 ) {
-    var rowMultiplier = 1
+
 
     val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
 
@@ -198,29 +202,30 @@ fun SetGameBoard(
             ),
     ) {
         items(boardSize.toDouble().pow(2).toInt()) { indexOfField ->
-            if (indexOfField == rowMultiplier * boardSize) {
-                ++rowMultiplier
-            }
+            val scale by animateFloatAsState(
+                targetValue = if (viewModel.shouldAnimate(indexOfField)) 1.1f else 1f,
+                animationSpec = keyframes {
+                    durationMillis = 1000
+                    1f at 0
+                    1.5f at 500
+                    1f at 1000
+                }, label = ""
+            )
 
             var modifier = Modifier
                 .size(squareSize)
                 .background(MaterialTheme.colorScheme.background)
 
             // Set the left borders of the fields.
-            if (indexOfField != (rowMultiplier * boardSize) - boardSize) {
+            if (viewModel.state.borderMap[indexOfField]?.first == true) {
                 modifier =
                     modifier.leftBorder(strokeWidth = 2.dp, color = Color.LightGray)
             }
 
             // Set the bottom borders of the fields.
-            if (rowMultiplier != boardSize) {
+            if (viewModel.state.borderMap[indexOfField]?.second == true) {
                 modifier =
                     modifier.bottomBorder(strokeWidth = 2.dp, color = Color.LightGray)
-            }
-
-            // Reset row multiplier to keep border upon recomposition.
-            if (indexOfField == boardSize.toDouble().pow(2).toInt() - 1) {
-                rowMultiplier = 1
             }
 
             Box(
@@ -234,7 +239,11 @@ fun SetGameBoard(
                     if (field.player == Player.Host) {
                         Icon(
                             modifier = Modifier
-                                .size((squareSize.times(0.7F))),
+                                .size((squareSize.times(0.7F)))
+                                .graphicsLayer(
+                                    scaleX = scale,
+                                    scaleY = scale
+                                ),
                             tint = MaterialTheme.colorScheme.secondary,
                             contentDescription = stringResource(R.string.host_icon_description),
                             painter = painterResource(R.drawable.material_symbols_outlined_close)
@@ -242,7 +251,11 @@ fun SetGameBoard(
                     } else {
                         Icon(
                             modifier = Modifier
-                                .size((squareSize.times(0.7F))),
+                                .size((squareSize.times(0.7F)))
+                                .graphicsLayer(
+                                    scaleX = scale,
+                                    scaleY = scale
+                                ),
                             tint = MaterialTheme.colorScheme.tertiary,
                             contentDescription = stringResource(R.string.guest_icon_description),
                             painter = painterResource(R.drawable.material_symbols_outlined_circle)

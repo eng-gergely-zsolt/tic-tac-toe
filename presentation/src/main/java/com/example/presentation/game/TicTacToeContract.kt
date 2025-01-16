@@ -12,7 +12,8 @@ class TicTacToeContract {
         val isDraw: Boolean,
         val currentPlayer: Player,
         val board: MutableSet<Field>,
-        val showEndGameDialog: Boolean
+        val showEndGameDialog: Boolean,
+        val borderMap: MutableMap<Int, Pair<Boolean, Boolean>>
     )
 }
 
