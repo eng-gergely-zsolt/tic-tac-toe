@@ -4,6 +4,7 @@ koin = "4.0.1"
 room = "2.6.1"
 junit = "4.13.2"
 kotlin = "2.1.0"
+rxandroid = "3.0.2"
 ksp = "2.1.0-1.0.29"
 espresso-core = "3.6.1"
 junit-androidx = "1.2.1"
@@ -13,6 +14,9 @@ compose-navigation = "2.8.5"
 kotlin-serialization = "2.1.0"
 kotlinx-serialization-json = "1.8.0"
 lifecycle-viewmodel-compose = "2.8.7"
+core-ktx = "1.15.0"
+appcompat = "1.7.0"
+material = "1.12.0"
 
 [libraries]
 #Core
@@ -37,6 +41,9 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
+# Rx
+reactivex-rxandroid = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxandroid" }
+
 # Koin
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
@@ -49,6 +56,9 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit-androidx" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

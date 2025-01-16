@@ -1,5 +1,6 @@
 package com.example.presentation.game
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,8 @@ import com.example.core.domain.model.Player
 import com.example.core.domain.model.TakenField
 import com.example.core.domain.model.TicTacToe
 import com.example.core.domain.repository.TicTacToeDbRepository
+import com.example.presentation.game.TicTacToeContract.TicTacToeState
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.time.LocalDateTime
@@ -27,7 +30,7 @@ class TicTacToeViewModel(
     private lateinit var resultSquare: Array<Array<TakenField>>
 
     private var _state by mutableStateOf(
-        TicTacToeContract.TicTacToeState(
+        TicTacToeState(
             draws = 0,
             hostWins = 0,
             guestWins = 0,
@@ -39,7 +42,7 @@ class TicTacToeViewModel(
         )
     )
 
-    val state: TicTacToeContract.TicTacToeState get() = _state
+    val state: TicTacToeState get() = _state
 
     private var startDateTime: LocalDateTime = LocalDateTime.now().withSecond(0).withNano(0)
 
@@ -49,6 +52,9 @@ class TicTacToeViewModel(
         disposables.clear()
     }
 
+    /**
+     * Dismisses the dialog.
+     */
     fun dismissDialog() {
         _state = _state.copy(
             winner = null,
@@ -57,6 +63,9 @@ class TicTacToeViewModel(
         )
     }
 
+    /**
+     * Resets the game for a rematch.
+     */
     fun replay() {
         takenMoves = 0
 
@@ -70,6 +79,9 @@ class TicTacToeViewModel(
         )
     }
 
+    /**
+     * Resets the game if the users want to restart the game without finishing it.
+     */
     fun resetBoard() {
         takenMoves = 0
 
@@ -80,6 +92,9 @@ class TicTacToeViewModel(
         )
     }
 
+    /**
+     * Initialize the board fo the game to start.
+     */
     fun initializeBoard(boardSize: Int) {
         this.boardSize = boardSize
 
@@ -95,6 +110,9 @@ class TicTacToeViewModel(
         }
     }
 
+    /**
+     * Sets the game variables when a field has been occupied.
+     */
     fun takeField(indexOfField: Int) {
         val lastTakenField = Field(
             index = indexOfField,
@@ -122,6 +140,9 @@ class TicTacToeViewModel(
         }
     }
 
+    /**
+     * Updates the result array when a field has been occupied.
+     */
     private fun updateResulSquare(indexOfField: Int) {
         val boardRowIndex = indexOfField / boardSize
 
@@ -133,6 +154,9 @@ class TicTacToeViewModel(
             magicSquare[boardColumnIndex][boardRowIndex]
     }
 
+    /**
+     * Update the current play after every turn.
+     */
     private fun updateCurrentPlayer() {
         _state = if (_state.currentPlayer == Player.Host) {
             _state.copy(
@@ -145,6 +169,9 @@ class TicTacToeViewModel(
         }
     }
 
+    /**
+     * Check whether a game is over or not. (Has been won or is a draw.)
+     */
     private fun checkEndGame(currentPlayer: Player) {
         _state = if (hasPlayerWon(currentPlayer)) {
             _state.copy(
@@ -164,6 +191,9 @@ class TicTacToeViewModel(
         saveTicTacToeMatch()
     }
 
+    /**
+     * Checks whether the current play has won the match with the last move or not.
+     */
     private fun hasPlayerWon(currentPlayer: Player): Boolean {
         // Check rows
         for (i in 0 until boardSize) {
@@ -189,6 +219,9 @@ class TicTacToeViewModel(
         return false
     }
 
+    /**
+     * Saves the match in the database.
+     */
     private fun saveTicTacToeMatch() {
         val disposable = ticTacToeDbRepository.saveTicTacToeMatch(
             TicTacToe(
@@ -199,12 +232,11 @@ class TicTacToeViewModel(
             )
         )
             .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                {
-
-                },
+                {},
                 { error ->
-
+                    Log.d("Error", error.message.toString())
                 }
             )
 

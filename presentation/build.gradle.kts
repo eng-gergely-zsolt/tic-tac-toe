@@ -41,6 +41,7 @@ android {
 dependencies {
     // Module
     implementation(project(":core"))
+    implementation(project(":common:utils"))
 
     // Jetpack Compose
     implementation(libs.androidx.material3)
@@ -51,6 +52,9 @@ dependencies {
 
     // Compose viewmodel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Rx
+    implementation(libs.reactivex.rxandroid)
 
     // Room
     implementation(libs.androidx.room.rxjava3)

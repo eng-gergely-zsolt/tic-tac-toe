@@ -34,12 +34,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,8 +45,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.core.domain.model.Player
 import com.example.presentation.R
-import kotlin.math.pow
 import com.example.presentation.game.TicTacToeSideEffect.Navigation.NavigateBack
+import com.example.utils.ComposeUtils.bottomBorder
+import com.example.utils.ComposeUtils.leftBorder
+import kotlin.math.pow
 
 @Composable
 fun TicTacToeScreen(
@@ -58,13 +56,6 @@ fun TicTacToeScreen(
     viewModel: TicTacToeViewModel,
     onNavigation: ((TicTacToeSideEffect.Navigation) -> Unit)
 ) {
-
-    var rowMultiplier = 1
-
-    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
-
-    val squareSize: Dp = screenWidthDp / boardSize - 8.dp
-
     viewModel.boardSize = boardSize
 
     LaunchedEffect(Unit) {
@@ -72,7 +63,7 @@ fun TicTacToeScreen(
     }
 
     viewModel.state.winner?.let { winner ->
-        EndGameDialog(
+        SetEndGameDialog(
             winner = winner,
             onNavigation = onNavigation,
             onReplay = { viewModel.replay() },
@@ -81,7 +72,7 @@ fun TicTacToeScreen(
     }
 
     if (viewModel.state.isDraw) {
-        EndGameDialog(
+        SetEndGameDialog(
             onNavigation = onNavigation,
             onReplay = { viewModel.replay() },
             onDismiss = { viewModel.dismissDialog() }
@@ -102,189 +93,247 @@ fun TicTacToeScreen(
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(50.dp),
-                            tint = MaterialTheme.colorScheme.secondary,
-                            contentDescription = stringResource(R.string.host_icon_description),
-                            painter = painterResource(R.drawable.material_symbols_outlined_close)
-                        )
+                SetInGameTopBar(
+                    viewModel = viewModel
+                )
 
-                        Text(
-                            text = stringResource(id = R.string.win_counter, viewModel.state.hostWins)
-                        )
-                    }
+                SetGameBoard(
+                    boardSize = boardSize,
+                    viewModel = viewModel
+                )
 
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(50.dp),
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            contentDescription = stringResource(R.string.guest_icon_description),
-                            painter = painterResource(R.drawable.material_symbols_outlined_circle)
-                        )
-
-                        Text(
-                            text = stringResource(id = R.string.win_counter, viewModel.state.guestWins)
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(50.dp),
-                            tint = Color.LightGray,
-                            contentDescription = stringResource(R.string.draw_icon_description),
-                            painter = painterResource(R.drawable.material_symbols_outlined_balance)
-                        )
-
-                        Text(
-                            text = stringResource(id = R.string.draw_counter, viewModel.state.draws)
-                        )
-                    }
-                }
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(boardSize),
-                    modifier = Modifier
-                        .padding(
-                            end = 8.dp,
-                            start = 8.dp
-                        ),
-                ) {
-                    items(boardSize.toDouble().pow(2).toInt()) { indexOfField ->
-                        if (indexOfField == rowMultiplier * boardSize) {
-                            ++rowMultiplier
-                        }
-
-                        var modifier = Modifier
-                            .size(squareSize)
-                            .background(Color.White)
-
-                        // Set the left borders of the fields.
-                        if (indexOfField != (rowMultiplier * boardSize) - boardSize) {
-                            modifier =
-                                modifier.leftBorder(strokeWidth = 2.dp, color = Color.LightGray)
-                        }
-
-                        // Set the bottom borders of the fields.
-                        if (rowMultiplier != boardSize) {
-                            modifier =
-                                modifier.bottomBorder(strokeWidth = 2.dp, color = Color.LightGray)
-                        }
-
-                        // Reset row multiplier to keep border upon recomposition.
-                        if (indexOfField == boardSize.toDouble().pow(2).toInt() - 1) {
-                            rowMultiplier = 1
-                        }
-
-                        Box(
-                            modifier = modifier
-                                .clickable { viewModel.takeField(indexOfField) },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            val field = viewModel.state.board.find { it.index == indexOfField }
-
-                            field?.let {
-                                if (field.player == Player.Host) {
-                                    Icon(
-                                        modifier = Modifier
-                                            .size((squareSize.times(0.7F))),
-                                        tint = MaterialTheme.colorScheme.secondary,
-                                        contentDescription = stringResource(R.string.host_icon_description),
-                                        painter = painterResource(R.drawable.material_symbols_outlined_close)
-                                    )
-                                } else {
-                                    Icon(
-                                        modifier = Modifier
-                                            .size((squareSize.times(0.7F))),
-                                        tint = MaterialTheme.colorScheme.tertiary,
-                                        contentDescription = stringResource(R.string.guest_icon_description),
-                                        painter = painterResource(R.drawable.material_symbols_outlined_circle)
-                                    )
-                                }
-                            }
-
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    FilledIconButton(
-                        modifier = Modifier
-                            .size(55.dp),
-                        onClick = {
-                            onNavigation.invoke(NavigateBack)
-                        },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        shape = IconButtonDefaults.filledShape
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(32.dp),
-                            tint = Color.White,
-                            contentDescription = stringResource(R.string.back_icon_description),
-                            painter = painterResource(R.drawable.material_symbols_outlined_arrow_back)
-                        )
-                    }
-
-                    OutlinedButton(
-                        modifier = Modifier
-                            .width(130.dp),
-                        onClick = { },
-                        shape = RoundedCornerShape(50),
-                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Gray)
-                    ) {
-                        Text(
-                            color = MaterialTheme.colorScheme.primary,
-                            text = viewModel.state.currentPlayer.name
-                        )
-                    }
-
-                    FilledIconButton(
-                        modifier = Modifier
-                            .size(55.dp),
-                        onClick = { viewModel.resetBoard() },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        shape = IconButtonDefaults.filledShape
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(32.dp),
-                            tint = Color.White,
-                            contentDescription = stringResource(R.string.reset_game_icon_description),
-                            painter = painterResource(R.drawable.material_symbols_outlined_reset_settings)
-                        )
-                    }
-                }
+                SetInGameBottomBar(
+                    viewModel = viewModel,
+                    onNavigation = onNavigation
+                )
             }
         }
     }
 }
 
+/**
+ * Sets the bar to show the actual game status (wins, draws).
+ * @param viewModel The viewmodel of the UI
+ */
 @Composable
-fun EndGameDialog(
+fun SetInGameTopBar(
+    viewModel: TicTacToeViewModel
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(50.dp),
+                tint = MaterialTheme.colorScheme.secondary,
+                contentDescription = stringResource(R.string.host_icon_description),
+                painter = painterResource(R.drawable.material_symbols_outlined_close)
+            )
+
+            Text(
+                text = stringResource(id = R.string.win_counter, viewModel.state.hostWins)
+            )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(50.dp),
+                tint = MaterialTheme.colorScheme.tertiary,
+                contentDescription = stringResource(R.string.guest_icon_description),
+                painter = painterResource(R.drawable.material_symbols_outlined_circle)
+            )
+
+            Text(
+                text = stringResource(id = R.string.win_counter, viewModel.state.guestWins)
+            )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(50.dp),
+                tint = Color.LightGray,
+                contentDescription = stringResource(R.string.draw_icon_description),
+                painter = painterResource(R.drawable.material_symbols_outlined_balance)
+            )
+
+            Text(
+                text = stringResource(id = R.string.draw_counter, viewModel.state.draws)
+            )
+        }
+    }
+}
+
+/**
+ * Sets the game board.
+ * @param boardSize Defines how many tiles the board consists of (Ex.: 3x3, 4x4, 5x5).
+ * @param viewModel The viewmodel of the UI
+ */
+@Composable
+fun SetGameBoard(
+    boardSize: Int,
+    viewModel: TicTacToeViewModel
+) {
+    var rowMultiplier = 1
+
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
+
+    val squareSize: Dp = screenWidthDp / boardSize - 8.dp
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(boardSize),
+        modifier = Modifier
+            .padding(
+                end = 8.dp,
+                start = 8.dp
+            ),
+    ) {
+        items(boardSize.toDouble().pow(2).toInt()) { indexOfField ->
+            if (indexOfField == rowMultiplier * boardSize) {
+                ++rowMultiplier
+            }
+
+            var modifier = Modifier
+                .size(squareSize)
+                .background(MaterialTheme.colorScheme.background)
+
+            // Set the left borders of the fields.
+            if (indexOfField != (rowMultiplier * boardSize) - boardSize) {
+                modifier =
+                    modifier.leftBorder(strokeWidth = 2.dp, color = Color.LightGray)
+            }
+
+            // Set the bottom borders of the fields.
+            if (rowMultiplier != boardSize) {
+                modifier =
+                    modifier.bottomBorder(strokeWidth = 2.dp, color = Color.LightGray)
+            }
+
+            // Reset row multiplier to keep border upon recomposition.
+            if (indexOfField == boardSize.toDouble().pow(2).toInt() - 1) {
+                rowMultiplier = 1
+            }
+
+            Box(
+                modifier = modifier
+                    .clickable { viewModel.takeField(indexOfField) },
+                contentAlignment = Alignment.Center,
+            ) {
+                val field = viewModel.state.board.find { it.index == indexOfField }
+
+                field?.let {
+                    if (field.player == Player.Host) {
+                        Icon(
+                            modifier = Modifier
+                                .size((squareSize.times(0.7F))),
+                            tint = MaterialTheme.colorScheme.secondary,
+                            contentDescription = stringResource(R.string.host_icon_description),
+                            painter = painterResource(R.drawable.material_symbols_outlined_close)
+                        )
+                    } else {
+                        Icon(
+                            modifier = Modifier
+                                .size((squareSize.times(0.7F))),
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            contentDescription = stringResource(R.string.guest_icon_description),
+                            painter = painterResource(R.drawable.material_symbols_outlined_circle)
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+/**
+ * Sets the in game bottom bar.
+ * @param viewModel The viewmodel of the UI.
+ * @param onNavigation The callback to set when navigation is needed.
+ */
+@Composable
+fun SetInGameBottomBar(
+    viewModel: TicTacToeViewModel,
+    onNavigation: (TicTacToeSideEffect.Navigation) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        FilledIconButton(
+            modifier = Modifier
+                .size(55.dp),
+            onClick = {
+                onNavigation.invoke(NavigateBack)
+            },
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = IconButtonDefaults.filledShape
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(32.dp),
+                tint = Color.White,
+                contentDescription = stringResource(R.string.back_icon_description),
+                painter = painterResource(R.drawable.material_symbols_outlined_arrow_back)
+            )
+        }
+
+        OutlinedButton(
+            modifier = Modifier
+                .width(130.dp),
+            onClick = { },
+            shape = RoundedCornerShape(50),
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Gray)
+        ) {
+            Text(
+                color = MaterialTheme.colorScheme.primary,
+                text = viewModel.state.currentPlayer.name
+            )
+        }
+
+        FilledIconButton(
+            modifier = Modifier
+                .size(55.dp),
+            onClick = { viewModel.resetBoard() },
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = IconButtonDefaults.filledShape
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(32.dp),
+                tint = Color.White,
+                contentDescription = stringResource(R.string.reset_game_icon_description),
+                painter = painterResource(R.drawable.material_symbols_outlined_reset_settings)
+            )
+        }
+    }
+}
+
+/**
+ * Sets the dialog when a match is over.
+ * @param onReplay The callback to call when replay is needed.
+ * @param onDismiss The callback to call when the dialog needs to be dismissed.
+ * @param winner The winner [Player] of the match.
+ * @param onNavigation The callback to set when navigation is needed.
+ */
+@Composable
+fun SetEndGameDialog(
     onReplay: () -> Unit,
     onDismiss: () -> Unit,
     winner: Player? = null,
@@ -375,51 +424,3 @@ fun EndGameDialog(
         }
     }
 }
-
-/**
- * Sets a left border in the modifier it's called upon.
- * @param color The color of the created border.
- * @param strokeWidth The width of the created border.
- */
-fun Modifier.leftBorder(color: Color, strokeWidth: Dp) = composed(
-    factory = {
-        val density = LocalDensity.current
-
-        val strokeWidthPx = density.run { strokeWidth.toPx() }
-
-        Modifier.drawBehind {
-            drawLine(
-                color = color,
-                strokeWidth = strokeWidthPx,
-                start = Offset(x = 0f, y = 0f),
-                end = Offset(x = 0f, y = size.height)
-            )
-        }
-    }
-)
-
-/**
- * Sets a bottom border in the modifier it's called upon.
- * @param color The color of the created border.
- * @param strokeWidth The width of the created border.
- */
-fun Modifier.bottomBorder(color: Color, strokeWidth: Dp) = composed(
-    factory = {
-        val density = LocalDensity.current
-
-        val strokeWidthPx = density.run { strokeWidth.toPx() }
-
-        Modifier.drawBehind {
-            val width = size.width
-
-            val height = size.height - strokeWidthPx / 2
-
-            drawLine(
-                color = color,
-                strokeWidth = strokeWidthPx,
-                start = Offset(x = 0f, y = height),
-                end = Offset(x = width, y = height)
-            )
-        }
-    }
-)

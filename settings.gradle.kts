@@ -26,4 +26,5 @@ include(":core")
 include(":presentation")
 
 include(":common:room")
+include(":common:utils")
 include(":common:design-kit")

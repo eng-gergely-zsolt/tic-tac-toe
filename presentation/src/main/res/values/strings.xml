@@ -4,6 +4,7 @@
     <string name="home">Home</string>
     <string name="draw">Draw</string>
     <string name="replay">Replay</string>
+    <string name="history">History</string>
 
     <!-- Content description -->
     <string name="home_icon_description">Home icon</string>

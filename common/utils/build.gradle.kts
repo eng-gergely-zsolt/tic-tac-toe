@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.design_kit"
+    namespace = "com.example.utils"
     compileSdk = ProjectConfiguration.COMPILE_SDK
 
     defaultConfig {
@@ -18,8 +18,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 

@@ -16,7 +16,6 @@ private val LightColorScheme = lightColorScheme(
     secondary = TuftsBlue,
     tertiary = SeaSerpent,
     background = Color.White,
-
 )
 
 /**
