@@ -8,15 +8,12 @@ rxandroid = "3.0.2"
 ksp = "2.1.0-1.0.29"
 espresso-core = "3.6.1"
 junit-androidx = "1.2.1"
-compose-bom = "2024.12.01"
+compose-bom = "2025.01.00"
 runtime-livedata = "1.7.6"
 compose-navigation = "2.8.5"
 kotlin-serialization = "2.1.0"
 kotlinx-serialization-json = "1.8.0"
 lifecycle-viewmodel-compose = "2.8.7"
-core-ktx = "1.15.0"
-appcompat = "1.7.0"
-material = "1.12.0"
 
 [libraries]
 #Core
@@ -56,9 +53,6 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit-androidx" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
