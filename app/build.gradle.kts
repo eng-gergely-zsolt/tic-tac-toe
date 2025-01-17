@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.example.tic_tac_toe"
-    compileSdk = ProjectConfiguration.COMPILE_SDK
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.tic_tac_toe"
-        minSdk = ProjectConfiguration.MIN_SDK
-        targetSdk = ProjectConfiguration.TARGET_SDK
+        minSdk = 31
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -36,7 +36,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = ProjectConfiguration.JVM_TARGET
+        jvmTarget = "21"
     }
 
     buildFeatures {

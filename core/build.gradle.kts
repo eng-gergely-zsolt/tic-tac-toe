@@ -5,10 +5,10 @@ plugins {
 
 android {
     namespace = "com.example.core"
-    compileSdk = ProjectConfiguration.COMPILE_SDK
+    compileSdk = 35
 
     defaultConfig {
-        minSdk = ProjectConfiguration.MIN_SDK
+        minSdk = 31
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -30,7 +30,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = ProjectConfiguration.JVM_TARGET
+        jvmTarget = "21"
     }
 }
 
